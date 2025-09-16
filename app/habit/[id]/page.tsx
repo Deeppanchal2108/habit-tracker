@@ -7,10 +7,10 @@ import { toast } from 'sonner'
 import { useParams } from 'next/navigation'
 
 function EditHabitPage() {
-    const { id } = useParams <{ id: string } > ();
+    const { id } = useParams<{ id: string }>();
     const [name, setName] = useState('')
     const [description, setDescription] = useState('')
-    const [frequency, setFrequency] = useState('DAILY')
+    const [frequency, setFrequency] = useState('')
     const [category, setCategory] = useState('')
     const [loading, setLoading] = useState(false)
 
@@ -25,7 +25,7 @@ function EditHabitPage() {
                 const { habit } = response.data
                 setName(habit.name || '')
                 setDescription(habit.description || '')
-                setFrequency(habit.frequency || 'DAILY')
+                setFrequency(habit.frequency || '')
                 setCategory(habit.category || '')
                 toast.success(response.data.message)
             } else {
@@ -53,7 +53,6 @@ function EditHabitPage() {
             const response = await axios.patch('/api/habit', {
                 id,
                 description,
-                frequency,
                 category
             })
 
@@ -89,14 +88,11 @@ function EditHabitPage() {
                     onChange={(e) => setDescription(e.target.value)}
                 />
 
-                <select
-                    value={frequency}
-                    onChange={(e) => setFrequency(e.target.value)}
-                    className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground"
-                >
-                    <option value="DAILY">Daily</option>
-                    <option value="WEEKLY">Weekly</option>
-                </select>
+                {/* Display the frequency as read-only text */}
+                <div className="w-full px-3 py-2 border border-border rounded-md bg-muted text-foreground">
+                    <span className="text-sm text-muted-foreground">Frequency: </span>
+                    <span className="font-medium">{frequency === 'DAILY' ? 'Daily' : 'Weekly'}</span>
+                </div>
 
                 <Input
                     placeholder="Category (optional)"

@@ -68,7 +68,6 @@ export async function POST(req: Request) {
     }
 }
 
-
 export async function PATCH(req: Request) {
     try {
         const cookieStore = await cookies();
@@ -83,7 +82,7 @@ export async function PATCH(req: Request) {
             return NextResponse.json({ success: false, message: "Invalid or expired token" }, { status: 401 });
         }
 
-        const { id, description, category, frequency } = await req.json();
+        const { id, description, category } = await req.json();
 
         if (!id) {
             return NextResponse.json({ success: false, message: "Habit ID is required" }, { status: 400 });
@@ -99,7 +98,6 @@ export async function PATCH(req: Request) {
             data: {
                 description: description ?? habit.description,
                 category: category ?? habit.category,
-                frequency: frequency ?? habit.frequency,
             },
         });
 
@@ -112,8 +110,6 @@ export async function PATCH(req: Request) {
         return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
     }
 }
-
-
 
 export async function GET(req: Request) {
     try {
@@ -143,6 +139,47 @@ export async function GET(req: Request) {
 
         return NextResponse.json(
             { success: true, message: "Habit retrieved successfully", habit },
+            { status: 200 }
+        );
+    } catch (err) {
+        console.error(err);
+        return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
+    }
+}
+
+export async function DELETE(req: Request) {
+    try {
+        const cookieStore = await cookies();
+        const token = cookieStore.get("token")?.value;
+
+        if (!token) {
+            return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
+        }
+
+        const userId = await getUserIdFromToken(token);
+        if (!userId) {
+            return NextResponse.json({ success: false, message: "Invalid or expired token" }, { status: 401 });
+        }
+
+        const { id } = await req.json();
+
+        if (!id) {
+            return NextResponse.json({ success: false, message: "Habit ID is required" }, { status: 400 });
+        }
+
+        const habit = await prisma.habit.findUnique({ where: { id } });
+        if (!habit || habit.userId !== userId) {
+            return NextResponse.json({ success: false, message: "Habit not found or unauthorized" }, { status: 404 });
+        }
+
+        await prisma.completion.deleteMany({
+            where: { habitId: id },
+        });
+        
+        await prisma.habit.delete({ where: { id } });
+
+        return NextResponse.json(
+            { success: true, message: "Habit deleted successfully" },
             { status: 200 }
         );
     } catch (err) {
