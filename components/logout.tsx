@@ -4,8 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import axios from "axios";
-import { toast } from "sonner"; 
+import axios, { AxiosError } from "axios"; 
+import { toast } from "sonner";
 
 export function LogoutButton() {
     const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -24,10 +24,13 @@ export function LogoutButton() {
                 router.push("/");
             }, 400);
 
-        } catch (error: any) {
-         
+        } catch (error) {
+          
+            const axiosError = error as AxiosError;
+
             toast.error(
-                error.response?.data?.message || "Failed to log out. Please try again."
+               
+                (axiosError.response?.data as { message?: string })?.message || "Failed to log out. Please try again."
             );
         } finally {
             setIsLoggingOut(false);

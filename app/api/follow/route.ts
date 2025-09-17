@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getUserIdFromToken } from "@/lib/token";
 import { cookies } from "next/headers";
-
 export async function POST(req: Request) {
     try {
         const cookieStore = await cookies();
@@ -14,8 +13,6 @@ export async function POST(req: Request) {
 
         const userId = await getUserIdFromToken(token);
         const { profileId } = await req.json();
-
-    
 
         if (!userId || !profileId) {
             return NextResponse.json(
@@ -36,8 +33,8 @@ export async function POST(req: Request) {
         });
 
         return NextResponse.json({ success: true, message: "Followed successfully" }, { status: 200 });
-    } catch (err: any) {
-        if (err.code === "P2002") {
+    } catch (err) { 
+        if (err instanceof Error && "code" in err && err.code === "P2002") {
             return NextResponse.json({ success: false, message: "Already following" }, { status: 400 });
         }
         console.error("Follow error:", err);

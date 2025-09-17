@@ -18,7 +18,11 @@ const eslintConfig = [
       "out/**",
       "build/**",
       "next-env.d.ts",
+      "lib/generated/prisma/**", // Updated path
     ],
+    // rules: {
+    //   "@typescript-eslint/no-explicit-any": "error",
+    // },
   },
 ];
 

@@ -3,18 +3,35 @@ import axios from "axios";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import { Card, CardContent , CardHeader, CardDescription, CardTitle} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardDescription, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import ActivityChart from "@/components/chart";
 import { Badge } from "@/components/ui/badge";
-import { User, Users, UserPlus, Loader2 ,Target} from "lucide-react";
+import { User, Users, UserPlus, Loader2, Target } from "lucide-react"
+interface RecentHabit {
+    id: string;
+    name: string;
+    frequency: string;
+    description?: string | null; 
+}
+
+interface Profile {
+    id: string;
+    name: string;
+    email: string;
+    followersCount: number;
+    followingCount: number;
+    isFollowing: boolean;
+    completions: string[];
+    recentHabits: RecentHabit[];
+}
 
 export default function ProfilePage() {
     const params = useParams();
     const id = params.id as string;
 
-    const [profile, setProfile] = useState<any | null>(null);
+    const [profile, setProfile] = useState<Profile | null>(null);
     const [loading, setLoading] = useState(true);
     const [currentUserId, setCurrentUserId] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -52,32 +69,33 @@ export default function ProfilePage() {
         setFollowLoading(true);
         try {
             if (isFollowing) {
-                
+
                 const { data } = await axios.delete("/api/follow", {
-                    data: { profileId: profile.id }, 
+                    data: { profileId: profile.id },
                 });
                 if (data.success) {
                     toast.success("Unfollowed successfully");
                     setIsFollowing(false);
-                    setProfile((prev: any) => ({
+                 
+                    setProfile((prev) => prev ? {
                         ...prev,
                         followersCount: prev.followersCount - 1,
-                    }));
+                    } : null);
                 } else {
                     toast.error(data.message || "Unfollow failed");
                 }
             } else {
-                // 🟢 Follow
+            
                 const { data } = await axios.post("/api/follow", {
-                    profileId: profile.id, 
+                    profileId: profile.id,
                 });
                 if (data.success) {
                     toast.success("Followed successfully");
                     setIsFollowing(true);
-                    setProfile((prev: any) => ({
+                    setProfile((prev) => prev ? {
                         ...prev,
                         followersCount: prev.followersCount + 1,
-                    }));
+                    } : null);
                 } else {
                     toast.error(data.message || "Follow failed");
                 }
@@ -134,10 +152,10 @@ export default function ProfilePage() {
                                         {followLoading ? (
                                             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                                         ) : isFollowing ? (
-                                            <User className="h-4 w-4 mr-2" />   
+                                            <User className="h-4 w-4 mr-2" />
                                         ) : (
-                                        <UserPlus className="h-4 w-4 mr-2" />
-    )}
+                                            <UserPlus className="h-4 w-4 mr-2" />
+                                        )}
                                         {isFollowing ? "Unfollow" : "Follow"}
                                     </Button>
                                 )}
@@ -162,7 +180,7 @@ export default function ProfilePage() {
                     <CardContent>
                         {profile.recentHabits && profile.recentHabits.length > 0 ? (
                             <div className="space-y-4">
-                                {profile.recentHabits.map((habit: any) => (
+                                {profile.recentHabits.map((habit) => (
                                     <div key={habit.id} className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors">
                                         <div className="flex items-center space-x-3">
                                             <div className="w-2 h-2 bg-primary rounded-full"></div>
@@ -186,7 +204,7 @@ export default function ProfilePage() {
                                 </div>
                                 <h3 className="font-medium text-foreground mb-2">No habits yet</h3>
                                 <p className="text-sm text-muted-foreground">
-                                    This user hasn't created any habits yet.
+                                    This user has not created any habits yet.
                                 </p>
                             </div>
                         )}

@@ -1,9 +1,15 @@
-"use client"
+"use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
+interface SuggestedUser {
+    id: string;
+    name: string;
+    email: string;
+}
+
 export default function Suggested() {
-    const [suggestions, setSuggestions] = useState<any[]>([]);
+    const [suggestions, setSuggestions] = useState<SuggestedUser[]>([]);
 
     useEffect(() => {
         async function fetchSuggestions() {
@@ -32,7 +38,6 @@ export default function Suggested() {
                                 <p className="font-semibold">{user.name}</p>
                                 <p className="text-sm text-gray-500">{user.email}</p>
                             </Link>
-
                         </li>
                     ))}
                 </ul>

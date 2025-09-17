@@ -2,6 +2,7 @@
 import React, { useState } from 'react'
 import axios from 'axios'
 import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
@@ -10,6 +11,7 @@ function SignUpPage() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [loading, setLoading] = useState(false)
+    const router = useRouter()
 
     const handleSubmit = async () => {
         try {
@@ -22,14 +24,21 @@ function SignUpPage() {
 
             if (data.success) {
                 toast.success('Registration successful!')
-                setName('')
-                setEmail('')
-                setPassword('')
+
+                router.refresh()
+                setTimeout(() => {
+                    router.push('/dashboard')
+                }, 300)
+
             } else {
                 toast.error(data.message || 'Registration failed')
             }
-        } catch (error: any) {
-            toast.error(error.response?.data?.message || 'Something went wrong')
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                toast.error(error.response?.data?.message || 'Something went wrong')
+            } else {
+                toast.error('An unknown error occurred.')
+            }
         } finally {
             setLoading(false)
         }

@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from "@/components/ui/button";
 import { toast } from 'sonner';
 import axios from 'axios';
@@ -8,12 +8,20 @@ import Link from 'next/link';
 import Suggested from '@/components/suggestion';
 import RecentActivity from '@/components/recent-activity';
 
+interface Habit {
+  id: string;
+  name: string;
+  description: string | null;
+  frequency: string;
+  completions: { completion_date: string; week_start?: string | null }[];
+}
+
 function Dashboard() {
-  const [habits, setHabits] = useState<any[]>([]);
+  const [habits, setHabits] = useState<Habit[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const fetchHabits = async () => {
+  const fetchHabits = useCallback(async () => {
     setLoading(true);
     setError('');
     try {
@@ -24,22 +32,26 @@ function Dashboard() {
         setError(response.data.message);
         toast.error(response.data.message);
       }
-    } catch (error: any) {
-      setError(error.response?.data?.message || 'Failed to fetch habits.');
-      toast.error(error.response?.data?.message || 'Failed to fetch habits.');
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.message || 'Failed to fetch habits.');
+        toast.error(err.response?.data?.message || 'Failed to fetch habits.');
+      } else {
+        setError('Failed to fetch habits.');
+        toast.error('Failed to fetch habits.');
+      }
     } finally {
       setLoading(false);
     }
-  };
-
+  }, []); 
   useEffect(() => {
     fetchHabits();
-  }, []);
+  }, [fetchHabits]);
 
   return (
     <div className="min-h-screen p-8 bg-background text-foreground">
       <div className="max-w-4xl mx-auto space-y-10">
-       
+
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold">My Habits</h1>
           <Link href="/habit/new">
@@ -63,7 +75,7 @@ function Dashboard() {
             ))
           ) : habits.length === 0 ? (
             <div className="text-center text-muted-foreground p-10 border border-dashed rounded-lg col-span-full">
-              <p>You don't have any habits yet. Start by creating one!</p>
+              <p>You do not have any habits yet. Start by creating one!</p>
             </div>
           ) : (
             habits.map((habit) => (

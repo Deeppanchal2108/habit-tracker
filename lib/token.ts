@@ -7,7 +7,7 @@ export async function getUserIdFromToken(token: string) {
         const { payload } = await jwtVerify(token, JWT_SECRET);
         return payload.id as string;
     } catch (error) {
-    
+         console.log(error)
         return null;
     }
 }

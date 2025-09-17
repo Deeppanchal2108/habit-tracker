@@ -3,8 +3,14 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import axios from "axios";
 
+
+interface SuggestedUser {
+    id: string;
+    name: string;
+    email: string;
+}
 export default function RecentActivity() {
-    const [friends, setFriends] = useState<any[]>([]);
+    const [friends, setFriends] = useState<SuggestedUser[]>([]);
 
     useEffect(() => {
         async function fetchFriends() {

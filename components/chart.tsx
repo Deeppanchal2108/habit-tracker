@@ -53,7 +53,7 @@ const ActivityChart: React.FC<ActivityChartProps> = ({
         }
 
         let streak = 0;
-        let currentDate = new Date();
+        const currentDate = new Date();
 
         while (true) {
             const dateStr = currentDate.toISOString().split('T')[0];

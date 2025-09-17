@@ -4,16 +4,20 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import axios from 'axios'
 import { toast } from 'sonner'
-import { useRouter } from 'next/navigation' 
+import { useRouter } from 'next/navigation'
 
 function CreateHabitPage() {
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const [frequency, setFrequency] = useState('DAILY')
   const [category, setCategory] = useState('')
+  const [loading, setLoading] = useState(false) 
 
-  const router = useRouter(); 
+  const router = useRouter();
+
   const handleSubmit = async () => {
+    setLoading(true); 
+
     try {
       const response = await axios.post('/api/habit', {
         name,
@@ -36,12 +40,14 @@ function CreateHabitPage() {
       } else {
         toast.error(response.data.message)
       }
-    } catch (error:any ) {
-      if (error.response?.data?.message) {
-        toast.error(error.response.data.message)
+    } catch (error) { 
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data?.message || 'Something went wrong');
       } else {
-        toast.error('Something went wrong')
+        toast.error('An unknown error occurred.');
       }
+    } finally {
+      setLoading(false); 
     }
   }
 
@@ -77,8 +83,8 @@ function CreateHabitPage() {
           onChange={(e) => setCategory(e.target.value)}
         />
 
-        <Button onClick={handleSubmit} className="w-full">
-          Create Habit
+        <Button onClick={handleSubmit} className="w-full" disabled={loading}>
+          {loading ? 'Creating...' : 'Create Habit'}
         </Button>
       </div>
     </div>

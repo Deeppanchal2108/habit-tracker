@@ -4,9 +4,13 @@ import { Button } from "@/components/ui/button";
 import { toast } from 'sonner';
 import axios from 'axios';
 import Link from 'next/link';
+interface CompletionRecord {
+    completion_date: string;
+    week_start?: string | null;
+}
 
 const isCompletedForPeriod = (
-    completions: { completion_date: string; week_start?: string | null }[],
+    completions: CompletionRecord[],
     frequency: string
 ): boolean => {
     const today = new Date();
@@ -20,11 +24,9 @@ const isCompletedForPeriod = (
     }
 
     if (frequency === "WEEKLY") {
-        
-        const day = today.getUTCDay();
-        const diff = (day === 0 ? -6 : 1) - day;
-        const weekStart = new Date(today);
-        weekStart.setUTCDate(today.getUTCDate() + diff);
+        const day = today.getUTCDay(); // 0 = Sunday, 1 = Monday
+        const diff = today.getUTCDate() - day + (day === 0 ? -6 : 1);
+        const weekStart = new Date(today.setUTCDate(diff));
         weekStart.setUTCHours(0, 0, 0, 0);
 
         return completions.some(c => {
@@ -36,35 +38,35 @@ const isCompletedForPeriod = (
 
     return false;
 };
-
-
 type HabitCardProps = {
     habit: {
         id: string;
         name: string;
         description: string | null;
         frequency: string;
-        completions: { completion_date: string }[];
+        completions: CompletionRecord[];
     };
     onHabitUpdated: () => void;
 };
-
 export const HabitCard: React.FC<HabitCardProps> = ({ habit, onHabitUpdated }) => {
     const [loading, setLoading] = useState(false);
     const completedToday = isCompletedForPeriod(habit.completions, habit.frequency);
-
     const handleCheckIn = async () => {
         setLoading(true);
         try {
             const response = await axios.post('/api/habit/completion', { habitId: habit.id });
             if (response.data.success) {
                 toast.success('Habit marked as complete for today!');
-                onHabitUpdated(); 
+                onHabitUpdated();
             } else {
                 toast.error(response.data.message);
             }
-        } catch (error: any) {
-            toast.error(error.response?.data?.message || 'Failed to mark habit as complete.');
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                toast.error(error.response?.data?.message || 'Failed to mark habit as complete.');
+            } else {
+                toast.error('An unknown error occurred.');
+            }
         } finally {
             setLoading(false);
         }
@@ -75,17 +77,21 @@ export const HabitCard: React.FC<HabitCardProps> = ({ habit, onHabitUpdated }) =
         try {
             const response = await axios.delete(`/api/habit`, {
                 data: {
-                id :habit.id
-            }
+                    id: habit.id
+                }
             });
             if (response.data.success) {
                 toast.success('Habit deleted successfully!');
-                onHabitUpdated(); 
+                onHabitUpdated();
             } else {
                 toast.error(response.data.message);
             }
-        } catch (error: any) {
-            toast.error(error.response?.data?.message || 'Failed to delete habit.');
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                toast.error(error.response?.data?.message || 'Failed to delete habit.');
+            } else {
+                toast.error('An unknown error occurred.');
+            }
         } finally {
             setLoading(false);
         }

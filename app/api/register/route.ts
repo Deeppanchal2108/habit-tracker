@@ -1,4 +1,4 @@
-import { NextResponse, NextRequest } from "next/server"
+import { NextResponse } from "next/server"
 
 import bcrypt from "bcrypt"
 import prisma from "@/lib/prisma"
@@ -42,7 +42,7 @@ export async function POST(req:Request) {
     } catch (error) {
    
         return NextResponse.json(
-            { success: false, message: "Something went wrong", status: 500 },
+            { success: false, message: "Something went wrong", status: 500,error },
             
         )
     }
