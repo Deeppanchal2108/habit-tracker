@@ -1,11 +1,10 @@
 import { Button } from "@/components/ui/button"
-import Link from "next/link"
+
 import Nav from "@/components/navbar"
 export default function Home() {
   return (
     <div className="min-h-screen bg-background">
 
-     <Nav/>
 
       <main className="container mx-auto px-6 py-20 text-center">
         <h1 className="text-4xl font-bold text-foreground mb-4">

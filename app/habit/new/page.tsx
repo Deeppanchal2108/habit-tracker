@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import axios from 'axios'
 import { toast } from 'sonner'
+import { useRouter } from 'next/navigation' 
 
 function CreateHabitPage() {
   const [name, setName] = useState('')
@@ -11,6 +12,7 @@ function CreateHabitPage() {
   const [frequency, setFrequency] = useState('DAILY')
   const [category, setCategory] = useState('')
 
+  const router = useRouter(); 
   const handleSubmit = async () => {
     try {
       const response = await axios.post('/api/habit', {
@@ -26,6 +28,11 @@ function CreateHabitPage() {
         setDescription('')
         setFrequency('DAILY')
         setCategory('')
+
+        router.refresh();
+        setTimeout(() => {
+          router.push('/dashboard');
+        }, 300);
       } else {
         toast.error(response.data.message)
       }

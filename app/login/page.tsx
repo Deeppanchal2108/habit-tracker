@@ -22,7 +22,12 @@ function Page() {
 
             if (data.success) {
                 toast.success("Login successful ")
-                router.push("/dashboard") 
+
+                router.refresh()
+
+                setTimeout(() => {
+                    router.push("/dashboard")
+                }, 300)
 
             } else {
                 toast.error(data.message || "Login failed ")

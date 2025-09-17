@@ -5,6 +5,8 @@ import { toast } from 'sonner';
 import axios from 'axios';
 import { HabitCard } from '@/components/habit-card';
 import Link from 'next/link';
+import Suggested from '@/components/suggestion';
+import RecentActivity from '@/components/recent-activity';
 
 function Dashboard() {
   const [habits, setHabits] = useState<any[]>([]);
@@ -36,8 +38,8 @@ function Dashboard() {
 
   return (
     <div className="min-h-screen p-8 bg-background text-foreground">
-      <div className="max-w-4xl mx-auto space-y-6">
-        {/* Header always visible */}
+      <div className="max-w-4xl mx-auto space-y-10">
+       
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold">My Habits</h1>
           <Link href="/habit/new">
@@ -45,17 +47,14 @@ function Dashboard() {
           </Link>
         </div>
 
-        {/* Error state */}
         {error && (
           <div className="text-center text-red-500 p-4 border rounded-lg">
             {error}
           </div>
         )}
 
-        {/* Habits grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {loading ? (
-            // Show skeleton placeholders instead of blocking the whole screen
             Array.from({ length: 4 }).map((_, i) => (
               <div
                 key={i}
@@ -75,6 +74,14 @@ function Dashboard() {
               />
             ))
           )}
+        </div>
+
+        <div>
+          <Suggested />
+        </div>
+
+        <div>
+          <RecentActivity />
         </div>
       </div>
     </div>

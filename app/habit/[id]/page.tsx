@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input"
 import axios from 'axios'
 import { toast } from 'sonner'
 import { useParams } from 'next/navigation'
+import { useRouter } from 'next/navigation' 
 
 function EditHabitPage() {
     const { id } = useParams<{ id: string }>();
@@ -13,6 +14,8 @@ function EditHabitPage() {
     const [frequency, setFrequency] = useState('')
     const [category, setCategory] = useState('')
     const [loading, setLoading] = useState(false)
+    
+      const router = useRouter(); 
 
     const fetchHabit = async () => {
         try {
@@ -28,6 +31,11 @@ function EditHabitPage() {
                 setFrequency(habit.frequency || '')
                 setCategory(habit.category || '')
                 toast.success(response.data.message)
+                router.refresh();
+                setTimeout(() => {
+                    router.push('/dashboard');
+                }, 300);
+              
             } else {
                 toast.error(response.data.message)
             }
