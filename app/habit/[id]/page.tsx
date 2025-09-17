@@ -69,7 +69,7 @@ function EditHabitPage() {
                 
                 setTimeout(() => {
                     router.push('/dashboard');
-                }, 300);
+                }, 500);
             } else {
                 toast.error(response.data.message);
             }

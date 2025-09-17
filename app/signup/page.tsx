@@ -28,7 +28,7 @@ function SignUpPage() {
                 router.refresh()
                 setTimeout(() => {
                     router.push('/dashboard')
-                }, 300)
+                }, 500)
 
             } else {
                 toast.error(data.message || 'Registration failed')

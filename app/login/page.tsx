@@ -31,7 +31,7 @@ function LoginPage() {
 
                 setTimeout(() => {
                     router.push("/dashboard")
-                }, 300)
+                }, 500)
 
             } else {
                 toast.error(data.message || "Login failed")
